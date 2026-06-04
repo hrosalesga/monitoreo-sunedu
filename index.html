@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monitoreo MV — Supervisión SUNEDU 2026 | UCV</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --ucv-blue:   #002060;
+    --ucv-red:    #C8102E;
+    --ucv-gold:   #FFB81C;
+    --bg:         #F4F6FA;
+    --surface:    #FFFFFF;
+    --border:     #D8DEE9;
+    --text:       #1A2030;
+    --text-muted: #5A6478;
+    --success:    #1A7A4A;
+    --success-bg: #E6F4ED;
+    --warning:    #8A5800;
+    --warning-bg: #FFF4D6;
+    --danger:     #B91C1C;
+    --danger-bg:  #FEF2F2;
+    --info:       #1E4FA0;
+    --info-bg:    #EEF3FB;
+    --radius:     8px;
+    --radius-lg:  12px;
+    --shadow:     0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--ucv-blue);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header-logo {
+    width: 32px;
+    height: 32px;
+    background: var(--ucv-gold);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--ucv-blue);
+    letter-spacing: -.5px;
+  }
+  .header-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,.9);
+    letter-spacing: .01em;
+  }
+  .header-sub {
+    font-size: 11px;
+    color: rgba(255,255,255,.5);
+    margin-top: 1px;
+  }
+  .header-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: rgba(255,255,255,.7);
+  }
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,.3);
+    object-fit: cover;
+  }
+  .user-avatar-placeholder {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--ucv-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ucv-blue);
+  }
+
+  /* ── LAYOUT ── */
+  .main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+
+  /* ── LOGIN SCREEN ── */
+  .login-screen {
+    min-height: calc(100vh - 56px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 48px 40px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .login-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--ucv-blue);
+    border-radius: 14px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .login-icon svg { fill: white; width: 28px; height: 28px; }
+  .login-card h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ucv-blue);
+    margin-bottom: 8px;
+  }
+  .login-card p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+  .login-note {
+    margin-top: 20px;
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-bar {
+    background: var(--border);
+    border-radius: 99px;
+    height: 4px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--ucv-blue);
+    border-radius: 99px;
+    transition: width .4s ease;
+  }
+  .progress-steps {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 28px;
+  }
+  .step-dot {
+    flex: 1;
+    height: 3px;
+    border-radius: 99px;
+    background: var(--border);
+    transition: background .3s;
+  }
+  .step-dot.active { background: var(--ucv-blue); }
+  .step-dot.done { background: var(--ucv-gold); }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-step {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--ucv-blue);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ucv-blue);
+  }
+  .card-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* ── FORM ELEMENTS ── */
+  .field { margin-bottom: 18px; }
+  .field:last-child { margin-bottom: 0; }
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: .01em;
+  }
+  label .req { color: var(--ucv-red); margin-left: 2px; }
+  label .hint {
+    font-weight: 400;
+    color: var(--text-muted);
+    margin-left: 4px;
+  }
+
+  select, input[type="text"], input[type="date"], textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--surface);
+    transition: border-color .2s, box-shadow .2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235A6478' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 32px;
+  }
+  select:focus, input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--ucv-blue);
+    box-shadow: 0 0 0 3px rgba(0,32,96,.1);
+  }
+  textarea { resize: vertical; min-height: 90px; }
+
+  .radio-group, .check-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .radio-opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    font-size: 13px;
+  }
+  .radio-opt:hover { border-color: var(--ucv-blue); background: var(--info-bg); }
+  .radio-opt.selected {
+    border-color: var(--ucv-blue);
+    background: var(--info-bg);
+  }
+  .radio-opt input { width: 16px; height: 16px; accent-color: var(--ucv-blue); flex-shrink: 0; }
+  .radio-opt .opt-text { line-height: 1.4; }
+  .radio-opt .opt-sub { font-size: 11px; color: var(--text-muted); }
+
+  /* ── MV LIST ── */
+  .mv-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .mv-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: border-color .2s, background .2s, transform .1s;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .mv-item:hover { border-color: var(--ucv-blue); background: var(--info-bg); }
+  .mv-item.selected {
+    border-color: var(--ucv-blue);
+    background: var(--info-bg);
+    border-width: 1.5px;
+  }
+  .mv-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .badge-cbc { background: #E6F1FB; color: #0C447C; }
+  .badge-semip { background: #EAF3DE; color: #27500A; }
+  .badge-del { background: #FFF2CC; color: #5C4A00; }
+  .badge-def { background: #FCE4D6; color: #5C2800; }
+  .badge-act { background: #F2F2F2; color: #3A3A3A; }
+  .mv-desc { font-size: 13px; line-height: 1.4; flex: 1; }
+  .mv-campus-tag {
+    font-size: 10px;
+    background: var(--warning-bg);
+    color: var(--warning);
+    border-radius: 4px;
+    padding: 1px 6px;
+    margin-left: 6px;
+    white-space: nowrap;
+  }
+  .mv-empty {
+    text-align: center;
+    padding: 32px;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  /* ── USER INFO BOX ── */
+  .user-info-box {
+    background: var(--info-bg);
+    border: 1px solid #B5D4F4;
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .user-info-box img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid #B5D4F4;
+  }
+  .user-info-text { font-size: 13px; }
+  .user-info-name { font-weight: 500; color: var(--ucv-blue); }
+  .user-info-email { font-size: 11px; color: var(--text-muted); }
+  .auto-tag {
+    font-size: 10px;
+    background: #E6F1FB;
+    color: var(--info);
+    padding: 1px 7px;
+    border-radius: 4px;
+    margin-left: 6px;
+    font-weight: 500;
+  }
+
+  /* ── BUTTONS ── */
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+    justify-content: flex-end;
+  }
+  .btn {
+    padding: 10px 22px;
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: opacity .2s, transform .1s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn-primary {
+    background: var(--ucv-blue);
+    color: white;
+  }
+  .btn-primary:hover { opacity: .88; }
+  .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: var(--bg); }
+  .btn-success {
+    background: var(--success);
+    color: white;
+  }
+
+  /* ── STATUS CHIPS ── */
+  .status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 99px;
+  }
+  .chip-cumple { background: var(--success-bg); color: var(--success); }
+  .chip-parcial { background: #FFF4D6; color: #8A5800; }
+  .chip-proceso { background: #EEF3FB; color: var(--info); }
+  .chip-nocumple { background: var(--danger-bg); color: var(--danger); }
+
+  /* ── SUCCESS SCREEN ── */
+  .success-screen {
+    text-align: center;
+    padding: 48px 20px;
+  }
+  .success-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--success-bg);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+  .success-screen h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--success);
+    margin-bottom: 10px;
+  }
+  .success-screen p {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 24px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ── ALERT ── */
+  .alert {
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .alert-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid #F5D88A; }
+  .alert-info { background: var(--info-bg); color: var(--info); border: 1px solid #B5D4F4; }
+
+  /* ── SEPARATOR ── */
+  .sep { height: 1px; background: var(--border); margin: 20px 0; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .header { padding: 0 16px; }
+    .main { padding: 20px 12px 60px; }
+    .card { padding: 20px 16px; }
+    .login-card { padding: 32px 20px; }
+    .btn-row { flex-direction: column-reverse; }
+    .btn { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">UCV</div>
+    <div>
+      <div class="header-title">Monitoreo de MV — SUNEDU 2026</div>
+      <div class="header-sub">Dirección de Acreditación · Vicerrectorado de la Calidad</div>
+    </div>
+  </div>
+  <div class="header-user" id="headerUser" style="display:none">
+    <img id="headerAvatar" class="user-avatar" src="" alt="">
+    <span id="headerName"></span>
+  </div>
+</header>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="login-screen main">
+  <div class="login-card">
+    <div class="login-icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+        <path d="M9 8h2v8H9zm4 0h2v8h-2z" style="display:none"/>
+        <path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 3a3 3 0 110 6 3 3 0 010-6zm0 14.2a7.2 7.2 0 01-6-3.22c.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08a7.2 7.2 0 01-6 3.22z"/>
+      </svg>
+    </div>
+    <h2>Iniciar sesión</h2>
+    <p>Accede con tu cuenta institucional <strong>@ucv.edu.pe</strong> para registrar el estado de los Medios de Verificación a tu cargo.</p>
+    <div id="g_id_onload"
+      data-client_id="697600642160-8mo4boac9bsgnerc78dld0ibou0qbte6.apps.googleusercontent.com"
+      data-callback="handleCredentialResponse"
+      data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+      data-type="standard"
+      data-size="large"
+      data-theme="outline"
+      data-text="signin_with"
+      data-shape="rectangular"
+      data-logo_alignment="left"
+      data-locale="es">
+    </div>
+    <div class="login-note">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Solo cuentas @ucv.edu.pe · Acceso restringido
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="appScreen" class="main" style="display:none">
+
+  <!-- STEP PROGRESS -->
+  <div class="progress-steps" id="progressSteps">
+    <div class="step-dot active" id="dot1"></div>
+    <div class="step-dot" id="dot2"></div>
+    <div class="step-dot" id="dot3"></div>
+    <div class="step-dot" id="dot4"></div>
+    <div class="step-dot" id="dot5"></div>
+  </div>
+
+  <!-- STEP 1: SELECCIÓN DE MV -->
+  <div id="step1">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-step">1</div>
+        <div>
+          <div class="card-title">Selección del Medio de Verificación</div>
+          <div class="card-sub">Seleccione el MV que va a reportar en este ciclo</div>
+        </div>
+      </div>
+
+      <!-- User info box -->
+      <div class="user-info-box" id="userInfoBox">
+        <img id="userPic" src="" alt="">
+        <div class="user-info-text">
+          <div class="user-info-name" id="userNameDisplay"></div>
+          <div class="user-info-email" id="userEmailDisplay"></div>
+        </div>
+        <span class="auto-tag">registrado automáticamente</span>
+      </div>
+
+      <!-- Responsable selector -->
+      <div class="field">
+        <label for="selResponsable">Responsable ante SUNEDU <span class="req">*</span><span class="hint">— seleccione su cargo o unidad</span></label>
+        <select id="selResponsable" onchange="loadMVList()">
+          <option value="">— Seleccione su responsabilidad —</option>
+        </select>
+      </div>
+
+      <!-- MV list -->
+      <div class="field" id="mvListContainer" style="display:none">
+        <label>Medio de Verificación <span class="req">*</span><span class="hint">— seleccione uno</span></label>
+        <div class="mv-list" id="mvList"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="goStep2()" id="btnStep1Next" disabled>
+          Continuar
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: CAMPUS -->
+  <div id="step2" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-step">2</div>
+        <div>
+          <div class="card-title">Campus / Sede</div>
+          <div class="card-sub" id="step2Sub">Seleccione el campus al que corresponde este reporte</div>
+        </div>
+      </div>
+
+      <div id="campusField">
+        <div class="field">
+          <label for="selCampus">Campus / Sede <span class="req">*</span></label>
+          <select id="selCampus">
+            <option value="">— Seleccione el campus —</option>
+          </select>
+        </div>
+        <div class="alert alert-warning">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Este MV tiene alcance <strong>Sede / Filial</strong>. Debe realizar un envío separado por cada campus. Un envío = un MV + un campus.</span>
+        </div>
+      </div>
+
+      <div id="campusNA" style="display:none">
+        <div class="alert alert-info">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>Este MV tiene alcance <strong>Institucional</strong>. No requiere selección de campus.</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goStep(1)">Atrás</button>
+        <button class="btn btn-primary" onclick="goStep3()" id="btnStep2Next">
+          Continuar
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: ESTADO -->
+  <div id="step3" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-step">3</div>
+        <div>
+          <div class="card-title">Estado y disponibilidad</div>
+          <div class="card-sub">Registre la situación actual del MV seleccionado</div>
+        </div>
+      </div>
+
+      <!-- MV summary -->
+      <div id="mvSummary" style="background:var(--bg);border-radius:var(--radius);padding:12px 14px;margin-bottom:20px;font-size:13px"></div>
+
+      <!-- Se cuenta -->
+      <div class="field">
+        <label>¿Se cuenta con el MV? <span class="req">*</span></label>
+        <div class="radio-group" id="rgCuenta">
+          <label class="radio-opt" onclick="selectRadio(this,'cuenta')">
+            <input type="radio" name="cuenta" value="Sí">
+            <div class="opt-text">Sí — el MV existe, está disponible y accesible</div>
+          </label>
+          <label class="radio-opt" onclick="selectRadio(this,'cuenta')">
+            <input type="radio" name="cuenta" value="En proceso">
+            <div class="opt-text">En proceso — en elaboración, trámite o actualización</div>
+          </label>
+          <label class="radio-opt" onclick="selectRadio(this,'cuenta')">
+            <input type="radio" name="cuenta" value="No">
+            <div class="opt-text">No — el MV no está disponible</div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Validado -->
+      <div class="field">
+        <label>¿Está validado por la instancia competente? <span class="req">*</span></label>
+        <div class="radio-group" id="rgValidado">
+          <label class="radio-opt" onclick="selectRadio(this,'validado')">
+            <input type="radio" name="validado" value="Sí — validado formalmente">
+            <div class="opt-text">Sí — validado y aprobado formalmente</div>
+          </label>
+          <label class="radio-opt" onclick="selectRadio(this,'validado')">
+            <input type="radio" name="validado" value="Pendiente">
+            <div class="opt-text">Pendiente — en proceso de validación</div>
+          </label>
+          <label class="radio-opt" onclick="selectRadio(this,'validado')">
+            <input type="radio" name="validado" value="No aplica">
+            <div class="opt-text">No aplica — este MV no requiere validación formal</div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Estado -->
+      <div class="field">
+        <label>Estado del MV <span class="req">*</span></label>
+        <div class="radio-group" id="rgEstado">
+          <label class="radio-opt" onclick="selectRadio(this,'estado')">
+            <input type="radio" name="estado" value="CUMPLE">
+            <div class="opt-text">
+              Cumple
+              <div class="opt-sub">El MV demuestra cumplimiento completo del indicador</div>
+            </div>
+          </label>
+          <label class="radio-opt" onclick="selectRadio(this,'estado')">
+            <input type="radio" name="estado" value="PARCIAL">
+            <div class="opt-text">
+              Cumple parcialmente
+              <div class="opt-sub">El MV existe pero presenta observaciones o brechas</div>
+            </div>
+          </label>
+          <label class="radio-opt" onclick="selectRadio(this,'estado')">
+            <input type="radio" name="estado" value="EN PROCESO">
+            <div class="opt-text">
+              En elaboración / mejora
+              <div class="opt-sub">El MV está siendo creado o mejorado</div>
+            </div>
+          </label>
+          <label class="radio-opt" onclick="selectRadio(this,'estado')">
+            <input type="radio" name="estado" value="NO CUMPLE">
+            <div class="opt-text">
+              No cumple
+              <div class="opt-sub">El MV no está disponible o no demuestra cumplimiento</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Fecha -->
+      <div class="field">
+        <label for="fechaEval">Fecha de evaluación <span class="req">*</span></label>
+        <input type="date" id="fechaEval" max="">
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goStep(2)">Atrás</button>
+        <button class="btn btn-primary" onclick="goStep4()" id="btnStep3Next" disabled>
+          Continuar
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: COMENTARIOS -->
+  <div id="step4" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-step">4</div>
+        <div>
+          <div class="card-title">Comentarios y acciones</div>
+          <div class="card-sub">Campo opcional — aclaraciones, acciones, observaciones</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="comentarios">Comentarios del responsable <span class="hint">— opcional</span></label>
+        <textarea id="comentarios" placeholder="Aclaraciones sobre el estado del MV, acciones a ejecutar para lograr el cumplimiento, documentos alternativos disponibles, fechas estimadas de regularización..."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goStep(3)">Atrás</button>
+        <button class="btn btn-primary" onclick="goStep5()">
+          Revisar y enviar
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5: REVISIÓN Y ENVÍO -->
+  <div id="step5" style="display:none">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-step">5</div>
+        <div>
+          <div class="card-title">Revisión y confirmación</div>
+          <div class="card-sub">Verifique los datos antes de enviar</div>
+        </div>
+      </div>
+
+      <div id="reviewContent"></div>
+
+      <div class="sep"></div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goStep(4)">Atrás</button>
+        <button class="btn btn-success" onclick="submitRecord()" id="btnSubmit">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirmar y enviar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="stepSuccess" style="display:none">
+    <div class="card success-screen">
+      <div class="success-icon">✓</div>
+      <h2>Registro enviado</h2>
+      <p>Su reporte ha sido recibido correctamente. La Dirección de Acreditación lo procesará en el ciclo quincenal.</p>
+      <button class="btn btn-primary" onclick="resetForm()" style="margin:0 auto">
+        Registrar otro MV
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── DATOS ─────────────────────────────────────────────────────────────────────
+const RESP_MV = {
+  "Centro de Investigaci\u00f3n Formativa e Integridad Cient\u00edfica": [
+    ["CBC-054", "CBC-054 \u2014 MV1 Repositorio institucional", false, "CBC"],
+    ["CBC-055", "CBC-055 \u2014 MV2.Repositorio nacional (ALICIA)", false, "CBC"],
+  ],
+  "Coordinaci\u00f3n de Cooperaci\u00f3n y Relaciones Internacionales": [
+    ["CBC-095", "CBC-095 \u2014 MV1. Registro de convenios.", true, "CBC"],
+  ],
+  "Coordinaci\u00f3n de Gesti\u00f3n del Talento Humano": [
+    ["CBC-065", "CBC-065 \u2014 MV1 Instrumento normativo, reglamento u otro documento que contenga los procedimientos de ", true, "CBC"],
+  ],
+  "Coordinaci\u00f3n de Infraestructura y Servicios Generales": [
+    ["CBC-043", "CBC-043 \u2014 MV1 Formato SUNEDU  C6 - Relaci\u00f3n de laboratorios y talleres de ense\u00f1anza", true, "CBC"],
+    ["CBC-044", "CBC-044 \u2014 MV2  Estudio t\u00e9cnico de c\u00e1lculo de aforo por local, elaborado y suscrito por un consultor ", true, "CBC"],
+    ["CBC-045", "CBC-045 \u2014 MV3 o el Certificado vigente de Inspecci\u00f3n T\u00e9cnica de Seguridad en Edificaciones que corre", true, "CBC"],
+    ["CBC-049", "CBC-049 \u2014 MV2 Plan de mantenimiento aprobado por la autoridad competente de la universidad (que indi", true, "CBC"],
+    ["SEMIP-006", "SEMIP-006 \u2014 MV1 Informe descriptivo del estado actual de la Infraestructura, equipamiento y mobiliario", true, "SEMIP"],
+    ["SEMIP-008", "SEMIP-008 \u2014 MV2 Formato de Licenciamiento SD3 Relaci\u00f3n de Laboratorios y Talleres, donde se especifica", true, "SEMIP"],
+  ],
+  "Coordinaci\u00f3n de Seguimiento del Graduado y Empleabilidad": [
+    ["CBC-094", "CBC-094 \u2014 MV2. Registro de actividades orientadas a la mejora de la inserci\u00f3n laboral, tales como cu", true, "CBC"],
+  ],
+  "Coordinaci\u00f3n de Seguridad": [
+    ["CBC-081", "CBC-081 \u2014 MV1 Documento que acredite el presupuesto destinado a la prestaci\u00f3n del servicio (Servicio", true, "CBC"],
+    ["CBC-082", "CBC-082 \u2014 MV2 Contratos o convenios para la prestaci\u00f3n del servicio a trav\u00e9s de terceros", true, "CBC"],
+  ],
+  "Coordinaci\u00f3n de Seguridad, Salud Ocupacional y Medio Ambiente": [
+    ["CBC-035", "CBC-035 \u2014 MV1 Planes de seguridad, incluyendo almacenamiento y gesti\u00f3n de sustancias inflamables y/o", true, "CBC"],
+    ["CBC-037", "CBC-037 \u2014 MV1 Planes de seguridad, incluyendo almacenamiento y gesti\u00f3n de sustancias inflamables y/o", true, "CBC"],
+    ["CBC-039", "CBC-039 \u2014 \u2022MV2 Para el caso de generaci\u00f3n de residuos peligrosos, la universidad deber\u00e1 presentar co", true, "CBC"],
+    ["CBC-040", "CBC-040 \u2014 MV3 Documento que demuestre la existencia de comit\u00e9s de seguridad biol\u00f3gica, qu\u00edmica y rad", true, "CBC"],
+  ],
+  "Coordinaci\u00f3n del Centro de Informaci\u00f3n": [
+    ["CBC-084", "CBC-084 \u2014 MV1. Formato SUNEDU C11 - Acervo bibliogr\u00e1fico f\u00edsico: Lista codificada del material bibli", true, "CBC"],
+    ["CBC-085", "CBC-085 \u2014 MV2 Acervo bibliogr\u00e1fico virtual:", true, "CBC"],
+  ],
+  "Defensor\u00eda Universitaria": [
+    ["DEF-001", "DEF-001 \u2014 La Universidad cuenta con un Defensor Universitario designado formalmente con acto adminis", false, "DEF"],
+    ["DEF-002", "DEF-002 \u2014 La normativa interna de la Universidad regula con claridad las competencias y no competenc", false, "DEF"],
+    ["DEF-003", "DEF-003 \u2014 La universidad cuenta con canales de atenci\u00f3n accesibles para todos los estudiantes, docen", false, "DEF"],
+    ["DEF-004", "DEF-004 \u2014 La Universidad cuenta con registro de denuncias y reclamaciones que garantice la trazabili", false, "DEF"],
+    ["DEF-005", "DEF-005 \u2014 La Universidad atiende, deriva y resuelve las denuncias y reclamaciones dentro de plazos r", false, "DEF"],
+    ["DEF-006", "DEF-006 \u2014 La Universidad resguarda la confidencialidad y la protecci\u00f3n de datos personales de los de", false, "DEF"],
+    ["DEF-007", "DEF-007 \u2014 La Defensor\u00eda act\u00faa con autonom\u00eda e imparcialidad respecto a las instancias de gobierno un", false, "DEF"],
+    ["DEF-008", "DEF-008 \u2014 La Universidad difunde en la sede y filiales la existencia, funciones y canales de contact", false, "DEF"],
+    ["DEF-009", "DEF-009 \u2014 La Universidad difunde en el portal web  la existencia, funciones y canales de contacto de", false, "DEF"],
+  ],
+  "Dir. GTH / Secretar\u00eda de Instrucci\u00f3n / VR Bienestar": [
+    ["DEL-005", "DEL-005 \u2014 La Universidad regula la conformaci\u00f3n de sus \u00f3rganos encargados de tramitar los procedimie", false, "DEL"],
+    ["DEL-006", "DEL-006 \u2014 La Universidad regula las formalidades de la elecci\u00f3n de la Secretar\u00eda de Instrucci\u00f3n", false, "DEL"],
+    ["DEL-007", "DEL-007 \u2014 La Universidad regula las formalidades de la elecci\u00f3n de la Comisi\u00f3n Disciplinaria para Ac", false, "DEL"],
+    ["DEL-008", "DEL-008 \u2014 La Universidad regula las formalidades de la elecci\u00f3n del Tribunal Disciplinario", false, "DEL"],
+    ["DEL-009", "DEL-009 \u2014 La Universidad regula los requisitos que debe cumplir la Secretar\u00eda de Instrucci\u00f3n", false, "DEL"],
+    ["DEL-010", "DEL-010 \u2014 La Universidad regula los requisitos que deben cumplir los miembros de la Comisi\u00f3n Discipl", false, "DEL"],
+    ["DEL-011", "DEL-011 \u2014 La Universidad regula los requisitos deben cumplir los miembros del Tribunal Disciplinario", false, "DEL"],
+    ["DEL-012", "DEL-012 \u2014 La Universidad regula la estructura, n\u00famero de miembros y paridad de g\u00e9nero de la Comisi\u00f3n", false, "DEL"],
+    ["DEL-013", "DEL-013 \u2014 La Universidad regula la estructura, n\u00famero de miembros y paridad de g\u00e9nero del Tribunal d", false, "DEL"],
+    ["DEL-014", "DEL-014 \u2014 La Universidad regula las causales de abstenci\u00f3n de la Secretar\u00eda de Instrucci\u00f3n", false, "DEL"],
+    ["DEL-015", "DEL-015 \u2014 La Universidad regula las causales de abstenci\u00f3n de los integrantes de la Comisi\u00f3n Discipl", false, "DEL"],
+    ["DEL-016", "DEL-016 \u2014 La Universidad regula las causales de abstenci\u00f3n de los integrantes del Tribunal Disciplin", false, "DEL"],
+    ["DEL-017", "DEL-017 \u2014 La Universidad regula que la Secretar\u00eda de Instrucci\u00f3n est\u00e1 a cargo de la etapa de Investi", false, "DEL"],
+    ["DEL-018", "DEL-018 \u2014 La Universidad regula que la Comisi\u00f3n Disciplinaria est\u00e1 a cargo de la etapa resolutiva.", false, "DEL"],
+    ["DEL-019", "DEL-019 \u2014 La Universidad regula que el Tribunal Disciplinario est\u00e1 a cargo de la etapa impugnativa", false, "DEL"],
+    ["DEL-020", "DEL-020 \u2014 La Universidad design\u00f3 la conformaci\u00f3n de la Secretar\u00eda de Instrucci\u00f3n", false, "DEL"],
+    ["DEL-021", "DEL-021 \u2014 La Universidad design\u00f3 la conformaci\u00f3n de la Comisi\u00f3n Disciplinaria para Actos de Hostigam", false, "DEL"],
+    ["DEL-022", "DEL-022 \u2014 La Universidad design\u00f3 la conformaci\u00f3n del Tribunal Disciplinario", false, "DEL"],
+  ],
+  "Direcci\u00f3n Acad\u00e9mica": [
+    ["CBC-046", "CBC-046 \u2014 MV1 Formato SUNEDU C7 - Equipos de laboratorios y talleres de ense\u00f1anza", true, "CBC"],
+    ["CBC-047", "CBC-047 \u2014 MV1 Formato SUNEDU C8 - Ambientes para docentes en el local de la universidad.", true, "CBC"],
+    ["SEMIP-009", "SEMIP-009 \u2014 MV2 Formato SD4 Equipamiento, mobiliario y software de laboratorios y talleres. Solo inclu", true, "SEMIP"],
+    ["SEMIP-010", "SEMIP-010 \u2014 MV3 Informe descriptivo de las aulas, laboratorios y talleres que har\u00e1n uso los programas.", true, "SEMIP"],
+  ],
+  "Direcci\u00f3n General": [
+    ["CBC-029", "CBC-029 \u2014 MV1: T\u00edtulos de propiedad de todos sus locales debidamente registrados en la SUNARP", true, "CBC"],
+    ["CBC-030", "CBC-030 \u2014 MV2: Contratos de alquiler debidamente registrados en la SUNARP de todos sus locales. Para", true, "CBC"],
+    ["CBC-031", "CBC-031 \u2014 MV3: T\u00edtulos o documentos que expresen el derecho real que ejerce sobre todos sus locales;", true, "CBC"],
+    ["CBC-032", "CBC-032 \u2014 MV4: Contrato, convenio u otro documento pertinente en caso de cesi\u00f3n en uso exclusivo.", true, "CBC"],
+  ],
+  "Direcci\u00f3n de Admisi\u00f3n y Promoci\u00f3n": [
+    ["CBC-024", "CBC-024 \u2014 Reglamento de Admisi\u00f3n aprobado por la autoridad competente", false, "CBC"],
+  ],
+  "Direcci\u00f3n de Bienestar y Responsabilidad Social Universitaria": [
+    ["CBC-070", "CBC-070 \u2014 MV1 Formato SUNEDU de ubicaci\u00f3n del t\u00f3pico, de encontrarse dentro de las instalaciones de ", true, "CBC"],
+    ["CBC-071", "CBC-071 \u2014 MV2 Documento que acredite el presupuesto destinado a la prestaci\u00f3n del servicio (t\u00f3pico)", true, "CBC"],
+    ["CBC-072", "CBC-072 \u2014 MV1 Documento que acredite el presupuesto destinado a la prestaci\u00f3n del servicio (servicio", true, "CBC"],
+    ["CBC-073", "CBC-073 \u2014 MV2 Contratos o convenios para la prestaci\u00f3n del servicio a trav\u00e9s de terceros", true, "CBC"],
+    ["CBC-074", "CBC-074 \u2014 MV1 Documento que acredite el presupuesto destinado a la prestaci\u00f3n del servicio (servicio", true, "CBC"],
+    ["CBC-075", "CBC-075 \u2014 MV2 Contratos o convenios para la prestaci\u00f3n del servicio a trav\u00e9s de terceros", true, "CBC"],
+    ["CBC-076", "CBC-076 \u2014 MV1 Documento que acredite el presupuesto destinado a la prestaci\u00f3n del servicio (servicio", true, "CBC"],
+    ["CBC-077", "CBC-077 \u2014 MV2 Contratos o convenios para la prestaci\u00f3n del servicio a trav\u00e9s de terceros", true, "CBC"],
+    ["CBC-079", "CBC-079 \u2014 MV1 Documento que acredite el presupuesto destinado a la prestaci\u00f3n del servicio.", true, "CBC"],
+    ["CBC-080", "CBC-080 \u2014 MV2 Contratos o convenios para la prestaci\u00f3n del servicio a trav\u00e9s de terceros", true, "CBC"],
+  ],
+  "Direcci\u00f3n de Contabilidad": [
+    ["CBC-005", "CBC-005 \u2014 Estados financieros", true, "CBC"],
+    ["ACT-001", "ACT-001 \u2014 Los bienes inmuebles y veh\u00edculos de la universidad se usan exclusivamente para fines unive", false, "ACT"],
+    ["ACT-002", "ACT-002 \u2014 Los bienes con inafectaci\u00f3n de impuesto predial, alcabala y patrimonio vehicular est\u00e1n des", false, "ACT"],
+    ["ACT-003", "ACT-003 \u2014 No existen operaciones con terceros cuyo retorno no est\u00e9 acreditado con fines educativos.", false, "ACT"],
+    ["ACT-004", "ACT-004 \u2014 No existen liberalidades en las remuneraciones ni operaciones financieras sin sustento.", false, "ACT"],
+    ["ACT-005", "ACT-005 \u2014 Los excedentes han sido reinvertidos en los componentes del art\u00edculo 118 de la Ley Univers", false, "ACT"],
+    ["ACT-006", "ACT-006 \u2014 Se ha presentado el Informe Anual de Reinversi\u00f3n (IAR) a SUNEDU y a SUNAT dentro de los pl", false, "ACT"],
+    ["ACT-007", "ACT-007 \u2014 El IAR ha sido publicado en el portal web institucional.", false, "ACT"],
+    ["ACT-008", "ACT-008 \u2014 Los importes declarados en el IAR son consistentes con la informaci\u00f3n contable auditada.", false, "ACT"],
+    ["ACT-009", "ACT-009 \u2014 No se distribuyen excedentes entre los miembros ni se utilizan fuera de los fines previsto", false, "ACT"],
+  ],
+  "Direcci\u00f3n de Cooperaci\u00f3n y Relaciones Internacionales": [
+    ["CBC-096", "CBC-096 \u2014 MV1. Documento o norma que acredite mecanismos de coordinaci\u00f3n y alianzas estrat\u00e9gicas con", true, "CBC"],
+  ],
+  "Direcci\u00f3n de Gesti\u00f3n del Talento Humano": [
+    ["CBC-053", "CBC-053 \u2014 MV1 Formato SUNEDU C9 - Relaci\u00f3n de Docentes actualizado al periodo vigente, seg\u00fan formato", true, "CBC"],
+    ["CBC-057", "CBC-057 \u2014 MV1 Formato SUNEDU C9 - Relaci\u00f3n de Docentes actualizado al periodo vigente.", true, "CBC"],
+    ["CBC-058", "CBC-058 \u2014 MV1 Formato SUNEDU C9 - Relaci\u00f3n de Docentes actualizado al periodo vigente.", true, "CBC"],
+    ["CBC-060", "CBC-060 \u2014 MV1 Instrumento normativo, reglamento u otro documento que contenga los procedimientos de ", false, "CBC"],
+    ["CBC-089", "CBC-089 \u2014 MV2. ROF, MOF u otro documento aprobado por la autoridad competente de la universidad, en ", false, "CBC"],
+    ["DEL-001", "DEL-001 \u2014 Ning\u00fan docente ni personal administrativo de la sede o filiales figura en las bases de dat", false, "DEL"],
+    ["DEL-002", "DEL-002 \u2014 Existe procedimiento institucional para verificar peri\u00f3dicamente la situaci\u00f3n legal del pe", false, "DEL"],
+    ["DEL-003", "DEL-003 \u2014 Ante la detecci\u00f3n de personal con condenas, se han adoptado las medidas de separaci\u00f3n dent", false, "DEL"],
+    ["DEL-004", "DEL-004 \u2014 Se informa a SUNEDU las acciones adoptadas en un plazo no mayor a 3 d\u00edas h\u00e1biles de ejecut", false, "DEL"],
+  ],
+  "Direcci\u00f3n de Grados y T\u00edtulos": [
+    ["CBC-092", "CBC-092 \u2014 MV4.Registro de graduados por semestre y programas de estudios de los dos \u00faltimos a\u00f1os (v\u00e1", true, "CBC"],
+  ],
+  "Direcci\u00f3n de Infraestructura y Servicios Generales": [
+    ["CBC-001", "CBC-001 \u2014 Formato A2 - Relaci\u00f3n e informaci\u00f3n de la sede filiales y locales", true, "CBC"],
+  ],
+  "Direcci\u00f3n de Innovaci\u00f3n Tecnol\u00f3gica": [
+    ["CBC-016", "CBC-016 \u2014 MV1 Gesti\u00f3n econ\u00f3mica y  financiera_tesorer\u00eda", false, "CBC"],
+    ["CBC-017", "CBC-017 \u2014 MV2 Gesti\u00f3n docente", false, "CBC"],
+    ["CBC-018", "CBC-018 \u2014 MV3 Gesti\u00f3n de matr\u00edcula", false, "CBC"],
+    ["CBC-019", "CBC-019 \u2014 MV4 Registro acad\u00e9mico estudiante- graduado", false, "CBC"],
+    ["CBC-020", "CBC-020 \u2014 MV4 Registro acad\u00e9mico colaborador", false, "CBC"],
+    ["CBC-021", "CBC-021 \u2014 MV5 Sistemas de aprendizaje virtual  Blackboard estudiante / Blackboard docente Clementina", false, "CBC"],
+    ["CBC-022", "CBC-022 \u2014 MV6 Gesti\u00f3n de biblioteca", false, "CBC"],
+    ["CBC-023", "CBC-023 \u2014 MV7 Pagos virtuales", false, "CBC"],
+    ["SEMIP-003", "SEMIP-003 \u2014 MV1 Contratos de arrendamiento o licencia de implementaci\u00f3n de recursos no presenciales, e", true, "SEMIP"],
+    ["SEMIP-004", "SEMIP-004 \u2014 MV2 Formato de Licenciamiento SD5 donde se detallan las caracter\u00edsticas de los recursos no", true, "SEMIP"],
+    ["SEMIP-005", "SEMIP-005 \u2014 MV3 De corresponder, plan de implementaci\u00f3n progresiva de recursos no presenciales a ser a", true, "SEMIP"],
+    ["SEMIP-007", "SEMIP-007 \u2014 MV1 Informe descriptivo del estado actual de la Infraestructura, que usaran los programas ", true, "SEMIP"],
+  ],
+  "Direcci\u00f3n de Planificaci\u00f3n y Desarrollo Institucional": [
+    ["CBC-004", "CBC-004 \u2014 Presupuesto de inversiones", true, "CBC"],
+    ["CBC-007", "CBC-007 \u2014 Plan Estrat\u00e9gico institucional aprobado por la autoridad competente", false, "CBC"],
+    ["CBC-048", "CBC-048 \u2014 MV1. Presupuesto de mantenimiento", true, "CBC"],
+  ],
+  "Direcci\u00f3n de Registros Acad\u00e9micos": [
+    ["CBC-002", "CBC-002 \u2014 Formato A4 - Relaci\u00f3n e informaci\u00f3n de programas y  menciones", false, "CBC"],
+    ["CBC-003", "CBC-003 \u2014 A5 - Relaci\u00f3n de programas y menciones por sede filiales y locales", true, "CBC"],
+  ],
+  "Direcci\u00f3n de Responsabilidad Social y Vallejo en la Comunidad": [
+    ["CBC-083", "CBC-083 \u2014 MV1. Documento que contenga las pol\u00edticas, planes y acciones de adecuaci\u00f3n al entorno y pr", false, "CBC"],
+  ],
+  "Direcci\u00f3n de Seguimiento del Graduado y Empleabilidad": [
+    ["CBC-090", "CBC-090 \u2014 MV3. Plan de seguimiento al graduado aprobado por la autoridad competente de la universida", false, "CBC"],
+    ["CBC-091", "CBC-091 \u2014 MV3. Informe de ejecuci\u00f3n del Plan de seguimiento al graduado", true, "CBC"],
+    ["CBC-093", "CBC-093 \u2014 MV1. Plataforma virtual de la Bolsa de Trabajo en portal web oficial (dominio propio de la", false, "CBC"],
+  ],
+  "Direcci\u00f3n de investigaci\u00f3n": [
+    ["CBC-056", "CBC-056 \u2014 MV1. Registro de proyectos", true, "CBC"],
+  ],
+  "Direcci\u00f3n del Centro de Formaci\u00f3n Docente y Desarrollo de Contenidos": [
+    ["CBC-067", "CBC-067 \u2014 MV1 Instrumento normativo, reglamento u otro documento que contenga los procedimientos de ", false, "CBC"],
+    ["CBC-068", "CBC-068 \u2014 MV2 Plan de capacitaci\u00f3n docente.  - Plan de Capacitaci\u00f3n del personal Docente.", false, "CBC"],
+    ["CBC-069", "CBC-069 \u2014 MV2 Plan de capacitaci\u00f3n docente.  - Informes de ejecuci\u00f3n del plan de Capacitaci\u00f3n del pe", true, "CBC"],
+    ["SEMIP-002", "SEMIP-002 \u2014 MV2 Documento que contenga los lineamientos, aprobados por autoridad competente, que desar", false, "SEMIP"],
+  ],
+  "Direcci\u00f3n del Centro de Informaci\u00f3n": [
+    ["CBC-086", "CBC-086 \u2014 Formato SD5 - Bases de datos", true, "CBC"],
+    ["CBC-087", "CBC-087 \u2014 Contratos o convenios de uso del servicio de bibliotecas virtuales, por lo menos equivalen", false, "CBC"],
+  ],
+  "Director Nacional de Cultura, Esparcimiento y Deporte": [
+    ["CBC-078", "CBC-078 \u2014 MV3 Normatividad, reglamento y/o estatuto en el que se indique la existencia de al menos t", false, "CBC"],
+  ],
+  "Director de Escuela Profesional": [
+    ["SEMIP-012", "SEMIP-012 \u2014 MV5 De corresponder, plan de implementaci\u00f3n progresiva de los laboratorios y talleres a se", true, "SEMIP"],
+  ],
+  "Jefatura Nacional de Seguridad, Salud Ocupacional y Medio Ambiente": [
+    ["CBC-033", "CBC-033 \u2014 MV1 Planes de seguridad, incluyendo almacenamiento y gesti\u00f3n de sustancias inflamables y/o", true, "CBC"],
+    ["CBC-034", "CBC-034 \u2014 MV1 Planes de seguridad, incluyendo almacenamiento y gesti\u00f3n de sustancias inflamables y/o", true, "CBC"],
+    ["CBC-036", "CBC-036 \u2014 MV1 Planes de seguridad, incluyendo almacenamiento y gesti\u00f3n de sustancias inflamables y/o", true, "CBC"],
+    ["CBC-038", "CBC-038 \u2014 MV1 Planes de seguridad, incluyendo almacenamiento y gesti\u00f3n de sustancias inflamables y/o", false, "CBC"],
+    ["CBC-041", "CBC-041 \u2014 MV1 Protocolo de seguridad para laboratorios y talleres", true, "CBC"],
+    ["SEMIP-011", "SEMIP-011 \u2014 MV4 Protocolos de seguridad de los laboratorios y talleres que detallan el proceso de iden", true, "SEMIP"],
+  ],
+  "Oficinas de Tecnolog\u00edas de Informaci\u00f3n (Soporte t\u00e9cnico)": [
+    ["CBC-042", "CBC-042 \u2014 MV1 Formato SUNEDU C3 - Disponibilidad de Internet", true, "CBC"],
+  ],
+  "Responsable del Portal de Transparencia": [
+    ["CBC-097", "CBC-097 \u2014 MV1. Misi\u00f3n y visi\u00f3n.", false, "CBC"],
+    ["CBC-098", "CBC-098 \u2014 MV2. Reglamento y calendario de admisi\u00f3n", false, "CBC"],
+    ["CBC-099", "CBC-099 \u2014 MV3.Temario para los ex\u00e1menes de admisi\u00f3n", true, "CBC"],
+    ["CBC-100", "CBC-100 \u2014 MV4. N\u00famero de postulantes e ingresantes seg\u00fan modalidades de ingreso de los \u00faltimos dos a", true, "CBC"],
+    ["CBC-101", "CBC-101 \u2014 MV5. Vacantes y fechas de concursos de selecci\u00f3n para docentes, seg\u00fan corresponda.", true, "CBC"],
+    ["CBC-102", "CBC-102 \u2014 MV6. N\u00famero de estudiantes por facultades y programas de estudio.", true, "CBC"],
+    ["CBC-103", "CBC-103 \u2014 MV7. Reglamento de estudiantes.", false, "CBC"],
+    ["CBC-104", "CBC-104 \u2014 MV8. Ambientes o espacios destinados a brindar los servicios sociales, deportivos o cultur", true, "CBC"],
+    ["CBC-105", "CBC-105 \u2014 MV9.T\u00edtulo de los proyectos de investigaci\u00f3n, actualizados al \u00faltimo semestre acad\u00e9mico", true, "CBC"],
+    ["CBC-106", "CBC-106 \u2014 MV10. Tarifas de los servicios prestados por toda \u00edndole (matr\u00edculas, pensi\u00f3n, constancias", false, "CBC"],
+    ["CBC-107", "CBC-107 \u2014 MV11. Plana docente y docentes investigadores.", true, "CBC"],
+    ["CBC-108", "CBC-108 \u2014 MV12. Malla curricular de todos sus programas de estudios.", true, "CBC"],
+  ],
+  "Secretario de la Junta General de Accionistas": [
+    ["CBC-006", "CBC-006 \u2014 MV1. Estatuto aprobado por la autoridad competente", false, "CBC"],
+    ["CBC-008", "CBC-008 \u2014 Resoluci\u00f3n que designa al decano de la FCS", false, "CBC"],
+    ["CBC-009", "CBC-009 \u2014 Resoluci\u00f3n que designa al decano de la FIA", false, "CBC"],
+    ["CBC-010", "CBC-010 \u2014 Resoluci\u00f3n que designa al decano de la FHUM", false, "CBC"],
+    ["CBC-011", "CBC-011 \u2014 Resoluci\u00f3n que designa al decano de la FACEM", false, "CBC"],
+    ["CBC-012", "CBC-012 \u2014 Resoluci\u00f3n que designa al decano de la FDCCPP", false, "CBC"],
+    ["CBC-027", "CBC-027 \u2014 MV1 Documento que acredite la existencia de la creaci\u00f3n del \u00e1rea de Gesti\u00f3n de la Calidad", true, "CBC"],
+    ["CBC-088", "CBC-088 \u2014 MV1. Documento de aprobaci\u00f3n de la creaci\u00f3n del \u00e1rea, direcci\u00f3n o departamento emitido por", true, "CBC"],
+  ],
+  "Vicerrectorado Acad\u00e9mico": [
+    ["CBC-013", "CBC-013 \u2014 MV1.Formato C1 - Malla curricular y an\u00e1lisis de cr\u00e9ditos acad\u00e9micos", true, "CBC"],
+    ["CBC-014", "CBC-014 \u2014 MV2. Curr\u00edculos - cargados en TRILCE", true, "CBC"],
+    ["CBC-025", "CBC-025 \u2014 MV1 Informe estad\u00edstico de Admisi\u00f3n de los \u00faltimos 2 a\u00f1os seg\u00fan corresponda", true, "CBC"],
+    ["CBC-059", "CBC-059 \u2014 MV1 Instrumento normativo, reglamento u otro documento que contenga los procedimientos de ", false, "CBC"],
+    ["CBC-061", "CBC-061 \u2014 MV1 Instrumento normativo, reglamento u otro documento que contenga los procedimientos de ", true, "CBC"],
+    ["CBC-062", "CBC-062 \u2014 MV1 Instrumento normativo, reglamento u otro documento que contenga los procedimientos de ", false, "CBC"],
+    ["CBC-063", "CBC-063 \u2014 MV1 Instrumento normativo, reglamento u otro documento que contenga los procedimientos de ", true, "CBC"],
+    ["CBC-064", "CBC-064 \u2014 MV1 Instrumento normativo, reglamento u otro documento que contenga los procedimientos de ", false, "CBC"],
+    ["CBC-066", "CBC-066 \u2014 MV1 Instrumento normativo, reglamento u otro documento que contenga los procedimientos de ", false, "CBC"],
+    ["SEMIP-001", "SEMIP-001 \u2014 MV1 Documento que contenga el modelo educativo que espec\u00edfica y define las caracter\u00edsticas", false, "SEMIP"],
+  ],
+  "Vicerrectorado de Calidad": [
+    ["CBC-026", "CBC-026 \u2014 MV1 Plan de Gesti\u00f3n de la Calidad Institucional aprobado por la autoridad competente.", false, "CBC"],
+    ["CBC-028", "CBC-028 \u2014 MV2 Relaci\u00f3n del personal calificado asignado a la misma.", true, "CBC"],
+  ],
+  "Vicerrectorado de Investigaci\u00f3n": [
+    ["CBC-015", "CBC-015 \u2014 MV1. Reglamento de grados y t\u00edtulos", false, "CBC"],
+    ["CBC-050", "CBC-050 \u2014 MV1 Estatuto o Plan Estrat\u00e9gico Institucional, u otro documento pertinente aprobado por la", false, "CBC"],
+    ["CBC-051", "CBC-051 \u2014 MV1 Resoluci\u00f3n rectoral que apruebe las l\u00edneas de investigaci\u00f3n u otro documento pertinent", true, "CBC"],
+    ["CBC-052", "CBC-052 \u2014 MV2 Presupuesto asignado para la investigaci\u00f3n, equipamiento, personal y otros.", true, "CBC"],
+  ],
+};
+
+const CAMPUS_LIST = ["F01 PIURA", "F02 CHICLAYO", "F03 TARAPOTO", "F04 CHIMBOTE", "F05L01 LIMA NORTE", "F05L04 LIMA NORTE", "F05L02 LIMA ESTE", "F05L03 LIMA ATE", "F06 CHEPÉN", "F07 MOYOBAMBA", "F08 HUARAZ", "F09 CALLAO", "S TRUJILLO"];
+
+const MATERIA_LABELS = {
+  CBC:   'CBC Institucional',
+  SEMIP: 'CBC Semipresencial / A distancia',
+  DEL:   'Delitos Ley 29988 / Hostigamiento',
+  DEF:   'Defensoría Universitaria',
+  ACT:   'Activos, Beneficios y Reinversión',
+};
+
+// ── ESTADO GLOBAL ─────────────────────────────────────────────────────────────
+let USER = null;
+let SELECTED_MV = null;
+
+// ── GOOGLE LOGIN ──────────────────────────────────────────────────────────────
+function handleCredentialResponse(response) {
+  const payload = parseJwt(response.credential);
+  if (!payload.email || !payload.email.endsWith('@ucv.edu.pe')) {
+    alert('Acceso restringido a cuentas @ucv.edu.pe. Por favor usa tu cuenta institucional.');
+    return;
+  }
+  USER = {
+    name:    payload.name,
+    email:   payload.email,
+    picture: payload.picture,
+    token:   response.credential,
+  };
+  showApp();
+}
+
+function parseJwt(token) {
+  const base64 = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+  return JSON.parse(decodeURIComponent(atob(base64).split('').map(c =>
+    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+}
+
+function showApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'block';
+
+  // Header user info
+  document.getElementById('headerUser').style.display = 'flex';
+  document.getElementById('headerAvatar').src = USER.picture || '';
+  document.getElementById('headerName').textContent = USER.name.split(' ')[0];
+
+  // User info box
+  document.getElementById('userPic').src = USER.picture || '';
+  document.getElementById('userNameDisplay').textContent = USER.name;
+  document.getElementById('userEmailDisplay').textContent = USER.email;
+
+  // Set today as max date
+  document.getElementById('fechaEval').max = new Date().toISOString().split('T')[0];
+  document.getElementById('fechaEval').value = new Date().toISOString().split('T')[0];
+
+  // Populate responsable selector
+  const sel = document.getElementById('selResponsable');
+  Object.keys(RESP_MV).sort().forEach(resp => {
+    const opt = document.createElement('option');
+    opt.value = resp;
+    opt.textContent = resp;
+    sel.appendChild(opt);
+  });
+
+  // Auto-match user email to responsible if possible
+  // (for now user selects manually)
+}
+
+// ── STEP 1: MV SELECTION ──────────────────────────────────────────────────────
+function loadMVList() {
+  const resp = document.getElementById('selResponsable').value;
+  const container = document.getElementById('mvListContainer');
+  const list = document.getElementById('mvList');
+  SELECTED_MV = null;
+  document.getElementById('btnStep1Next').disabled = true;
+
+  if (!resp) { container.style.display = 'none'; return; }
+
+  const mvs = RESP_MV[resp] || [];
+  list.innerHTML = '';
+
+  if (!mvs.length) {
+    list.innerHTML = '<div class="mv-empty">No se encontraron MV asignados.</div>';
+    container.style.display = 'block';
+    return;
+  }
+
+  mvs.forEach(mv => {
+    const [id, label, needs_campus, materia_code] = mv;
+    const desc = label.split(' — ').slice(1).join(' — ');
+    const badgeClass = 'badge-' + materia_code.toLowerCase();
+    const campusTag = needs_campus ? '<span class="mv-campus-tag">por campus</span>' : '';
+
+    const div = document.createElement('div');
+    div.className = 'mv-item';
+    div.dataset.id = id;
+    div.dataset.needs_campus = needs_campus;
+    div.dataset.materia = materia_code;
+    div.dataset.label = label;
+    div.innerHTML = `
+      <span class="mv-badge ${badgeClass}">${id}</span>
+      <span class="mv-desc">${desc}${campusTag}</span>
+    `;
+    div.onclick = () => selectMV(div);
+    list.appendChild(div);
+  });
+
+  container.style.display = 'block';
+}
+
+function selectMV(el) {
+  document.querySelectorAll('.mv-item').forEach(i => i.classList.remove('selected'));
+  el.classList.add('selected');
+  SELECTED_MV = {
+    id:           el.dataset.id,
+    needs_campus: el.dataset.needs_campus === 'true',
+    materia:      el.dataset.materia,
+    label:        el.dataset.label,
+    desc:         el.querySelector('.mv-desc').textContent.trim(),
+  };
+  document.getElementById('btnStep1Next').disabled = false;
+}
+
+function goStep2() {
+  if (!SELECTED_MV) return;
+  const campusField = document.getElementById('campusField');
+  const campusNA    = document.getElementById('campusNA');
+  const selCampus   = document.getElementById('selCampus');
+
+  if (SELECTED_MV.needs_campus) {
+    campusField.style.display = 'block';
+    campusNA.style.display    = 'none';
+    selCampus.innerHTML = '<option value="">— Seleccione el campus —</option>';
+    CAMPUS_LIST.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c; opt.textContent = c;
+      selCampus.appendChild(opt);
+    });
+    document.getElementById('btnStep2Next').disabled = false;
+  } else {
+    campusField.style.display = 'none';
+    campusNA.style.display    = 'block';
+    document.getElementById('btnStep2Next').disabled = false;
+  }
+  goStep(2);
+}
+
+function goStep3() {
+  const campus = document.getElementById('selCampus').value;
+  if (SELECTED_MV.needs_campus && !campus) {
+    alert('Por favor seleccione el campus.');
+    return;
+  }
+  // MV summary
+  const matLabel = MATERIA_LABELS[SELECTED_MV.materia] || SELECTED_MV.materia;
+  const campusLabel = SELECTED_MV.needs_campus ? campus : 'Institucional';
+  document.getElementById('mvSummary').innerHTML = `
+    <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap">
+      <span class="mv-badge badge-${SELECTED_MV.materia.toLowerCase()}" style="font-size:11px">${SELECTED_MV.id}</span>
+      <span style="font-size:12px;color:var(--text-muted)">${matLabel}</span>
+      <span style="font-size:12px;color:var(--text-muted)">·</span>
+      <span style="font-size:12px;color:var(--text-muted)">${campusLabel}</span>
+    </div>
+    <div style="font-size:13px;margin-top:6px;font-weight:500">${SELECTED_MV.desc}</div>
+  `;
+  goStep(3);
+  checkStep3();
+}
+
+// ── STEP 3 VALIDATION ─────────────────────────────────────────────────────────
+function selectRadio(el, group) {
+  document.querySelectorAll(`input[name="${group}"]`).closest
+    ? null : null;
+  const opts = el.closest('.radio-group').querySelectorAll('.radio-opt');
+  opts.forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  el.querySelector('input').checked = true;
+  checkStep3();
+}
+
+function checkStep3() {
+  const cuenta  = document.querySelector('input[name="cuenta"]:checked');
+  const validado= document.querySelector('input[name="validado"]:checked');
+  const estado  = document.querySelector('input[name="estado"]:checked');
+  const fecha   = document.getElementById('fechaEval').value;
+  document.getElementById('btnStep3Next').disabled = !(cuenta && validado && estado && fecha);
+}
+
+document.addEventListener('change', e => {
+  if (e.target.id === 'fechaEval') checkStep3();
+});
+
+function goStep4() {
+  const cuenta  = document.querySelector('input[name="cuenta"]:checked');
+  const validado= document.querySelector('input[name="validado"]:checked');
+  const estado  = document.querySelector('input[name="estado"]:checked');
+  const fecha   = document.getElementById('fechaEval').value;
+  if (!cuenta || !validado || !estado || !fecha) return;
+  goStep(4);
+}
+
+// ── STEP 5: REVIEW ────────────────────────────────────────────────────────────
+function goStep5() {
+  const campus      = SELECTED_MV.needs_campus ? document.getElementById('selCampus').value : 'Institucional';
+  const cuenta      = document.querySelector('input[name="cuenta"]:checked')?.value;
+  const validado    = document.querySelector('input[name="validado"]:checked')?.value;
+  const estadoVal   = document.querySelector('input[name="estado"]:checked')?.value;
+  const fecha       = document.getElementById('fechaEval').value;
+  const comentarios = document.getElementById('comentarios').value;
+
+  const estadoChip = {
+    CUMPLE: '<span class="status-chip chip-cumple">Cumple</span>',
+    PARCIAL: '<span class="status-chip chip-parcial">Cumple parcialmente</span>',
+    'EN PROCESO': '<span class="status-chip chip-proceso">En elaboración</span>',
+    'NO CUMPLE': '<span class="status-chip chip-nocumple">No cumple</span>',
+  }[estadoVal] || estadoVal;
+
+  document.getElementById('reviewContent').innerHTML = `
+    <table style="width:100%;font-size:13px;border-collapse:collapse">
+      ${[
+        ['Responsable', document.getElementById('selResponsable').value],
+        ['MV', `<span class="mv-badge badge-${SELECTED_MV.materia.toLowerCase()}">${SELECTED_MV.id}</span> ${SELECTED_MV.desc}`],
+        ['Campus / Sede', campus],
+        ['¿Se cuenta con el MV?', cuenta],
+        ['¿Validado?', validado],
+        ['Estado', estadoChip],
+        ['Fecha de evaluación', fecha],
+        ['Comentarios', comentarios || '<em style="color:var(--text-muted)">Sin comentarios</em>'],
+        ['Reportado por', USER.email],
+      ].map(([k,v]) => `
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:10px 0;color:var(--text-muted);width:38%;font-size:12px">${k}</td>
+          <td style="padding:10px 0 10px 12px;font-weight:400">${v}</td>
+        </tr>`).join('')}
+    </table>
+  `;
+  goStep(5);
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────────────────────
+async function submitRecord() {
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  const campus      = SELECTED_MV.needs_campus ? document.getElementById('selCampus').value : 'Institucional';
+  const responsable = document.getElementById('selResponsable').value;
+  const cuenta      = document.querySelector('input[name="cuenta"]:checked')?.value;
+  const validado    = document.querySelector('input[name="validado"]:checked')?.value;
+  const estadoVal   = document.querySelector('input[name="estado"]:checked')?.value;
+  const fecha       = document.getElementById('fechaEval').value;
+  const comentarios = document.getElementById('comentarios').value;
+
+  const payload = {
+    timestamp:    new Date().toISOString(),
+    email:        USER.email,
+    nombre:       USER.name,
+    responsable:  responsable,
+    id_mv:        SELECTED_MV.id,
+    mv_desc:      SELECTED_MV.desc,
+    materia:      MATERIA_LABELS[SELECTED_MV.materia],
+    campus:       campus,
+    se_cuenta:    cuenta,
+    validado:     validado,
+    estado:       estadoVal,
+    fecha_eval:   fecha,
+    comentarios:  comentarios,
+  };
+
+  try {
+    const PROXY_URL = 'https://script.google.com/macros/s/REEMPLAZAR_CON_URL_PROXY/exec';
+    await fetch(PROXY_URL + '?action=registrar&data=' + encodeURIComponent(JSON.stringify(payload)), {
+      method: 'GET', mode: 'no-cors'
+    });
+    goStep('success');
+  } catch(err) {
+    alert('Error al enviar. Verifique su conexión e intente nuevamente.');
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Confirmar y enviar';
+  }
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+const STEP_IDS = ['step1','step2','step3','step4','step5','stepSuccess'];
+const DOTS = [null,'dot1','dot2','dot3','dot4','dot5'];
+
+function goStep(n) {
+  STEP_IDS.forEach(id => document.getElementById(id).style.display = 'none');
+  if (n === 'success') {
+    document.getElementById('stepSuccess').style.display = 'block';
+    document.getElementById('progressSteps').style.display = 'none';
+  } else {
+    document.getElementById('step' + n).style.display = 'block';
+    for (let i = 1; i <= 5; i++) {
+      const dot = document.getElementById('dot' + i);
+      if (i < n)       dot.className = 'step-dot done';
+      else if (i === n) dot.className = 'step-dot active';
+      else              dot.className = 'step-dot';
+    }
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetForm() {
+  SELECTED_MV = null;
+  document.getElementById('selResponsable').value = '';
+  document.getElementById('mvListContainer').style.display = 'none';
+  document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+  document.querySelectorAll('.radio-opt').forEach(o => o.classList.remove('selected'));
+  document.querySelectorAll('.mv-item').forEach(i => i.classList.remove('selected'));
+  document.getElementById('comentarios').value = '';
+  document.getElementById('btnStep1Next').disabled = true;
+  document.getElementById('progressSteps').style.display = 'flex';
+  goStep(1);
+}
+</script>
+</body>
+</html>
