@@ -59,18 +59,10 @@
     gap: 12px;
   }
   .header-logo {
-    width: 32px;
-    height: 32px;
-    background: var(--ucv-gold);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'IBM Plex Mono', monospace;
-    font-weight: 500;
-    font-size: 13px;
-    color: var(--ucv-blue);
-    letter-spacing: -.5px;
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
   }
   .header-title {
     font-size: 13px;
@@ -506,8 +498,8 @@
 
 <!-- HEADER -->
 <header class="header">
-  <div class="header-brand">
-    <div class="header-logo">UCV</div>
+    <div class="header-brand">
+      <img src="logo_ucv.png" alt="Logo UCV" class="header-logo">
     <div>
       <div class="header-title">Monitoreo de MV — SUNEDU 2026</div>
       <div class="header-sub">Dirección de Acreditación · Vicerrectorado de la Calidad</div>
@@ -1323,7 +1315,7 @@ async function submitRecord() {
   };
 
   try {
-    const PROXY_URL = 'https://script.google.com/a/macros/ucv.edu.pe/s/AKfycbyDAo-yygJLz0DalVwkMLRsW0gIikBIlUzx0diUWPxXbhRz_xLDDGN1W3VT0Glg0_uhig/exec';
+    const PROXY_URL = 'https://script.google.com/macros/s/REEMPLAZAR_CON_URL_PROXY/exec';
     await fetch(PROXY_URL + '?action=registrar&data=' + encodeURIComponent(JSON.stringify(payload)), {
       method: 'GET', mode: 'no-cors'
     });
