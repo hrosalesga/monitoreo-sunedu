@@ -1315,7 +1315,7 @@ async function submitRecord() {
   };
 
   try {
-    const PROXY_URL = 'https://script.google.com/a/macros/ucv.edu.pe/s/AKfycbyDAo-yygJLz0DalVwkMLRsW0gIikBIlUzx0diUWPxXbhRz_xLDDGN1W3VT0Glg0_uhig/exec';
+    const PROXY_URL = 'https://script.google.com/macros/s/AKfycbyDAo-yygJLz0DalVwkMLRsW0gIikBIlUzx0diUWPxXbhRz_xLDDGN1W3VT0Glg0_uhig/exec';
     await fetch(PROXY_URL + '?action=registrar&data=' + encodeURIComponent(JSON.stringify(payload)), {
       method: 'GET', mode: 'no-cors'
     });
